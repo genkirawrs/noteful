@@ -1,0 +1,16 @@
+.note-sidebar-back-btn {
+    text-align:center;
+    width:100%;
+    display:inline-block;
+    border:1px solid black;
+    margin-bottom:10px;
+    padding:10px;
+}
+
+.note-sidebar-folder {
+	text-align:left
+}
+
+.note-sidebar-folder h3 {
+	font-size:22px;
+}
