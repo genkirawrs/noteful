@@ -1,16 +1,31 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import NoteCard from '../NoteCard/NoteCard';
+import AddNoteButton from '../AddNoteButton/AddNoteButton';
 
-import './NotePage.css';
+import NotefulContext from '../NotefulContext.js';
 
 class NotePage extends Component {
+  static contextType = NotefulContext;
+
+  handleDeleteNote = () => {
+    this.props.history.push(`/`)
+  }
 
   render(){
+    const { notes } = this.context;
+    let noteInfo = {};
+    notes.forEach( (item) => {
+	if( item.id === this.props.match.params.noteId){
+	    noteInfo = item;	  
+        }
+    });
+
     return(
-	<div className='notepage'>
-	<NoteCard note={this.props.note}/>
-	<p>{this.props.note.content}</p>
-	</div>
+        <div className='notepage'>
+        <NoteCard noteId={noteInfo.id} modified={noteInfo.modified} name={noteInfo.name} onDeleteNote={this.handleDeleteNote}/>
+        <p>{noteInfo.content}</p>
+        </div>
     );
   }
 

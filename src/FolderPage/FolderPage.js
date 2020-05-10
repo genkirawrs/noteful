@@ -3,18 +3,22 @@ import { Link } from 'react-router-dom';
 import NoteCard from '../NoteCard/NoteCard';
 import AddNoteButton from '../AddNoteButton/AddNoteButton';
 
+import NotefulContext from '../NotefulContext.js';
 import './FolderPage.css';
 
 class FolderPage extends Component {
+  static contextType = NotefulContext;
 
   render(){
+    const { notes } = this.context;
+    const folderNotes = notes.filter( ({folderId})=> folderId === this.props.match.params.folderId);
     return(
 	<ul>
-        {this.props.notes.map(note=>{
+        {folderNotes.map(note=>{
             return(
                 <li key={note.id}>
                   <Link to={`/note/${note.id}`}>
-		    <NoteCard note={note} />
+		    <NoteCard noteId={note.id} modified={note.modified} name={note.name}  />
                   </Link>
                 </li>
             );

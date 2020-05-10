@@ -11,63 +11,78 @@ import NoteSidebar from './NoteSidebar/NoteSidebar';
 import AddNote from './AddNote/AddNote';
 import AddFolder from './AddFolder/AddFolder';
 
+import NotefulContext from './NotefulContext.js';
 
-import STORE from './store';
 import './App.css';
 
 class App extends Component {
   state = {
-    folders: STORE.folders,
-    notes: STORE.notes
+    folders: [],
+    notes: [],
+    error: null,
+    handleDeleteNote: this.handleDeleteNote
+  }
+
+  setLists = (folders, notes) => {
+    this.setState({
+      folders: folders,
+      notes: notes,
+      error: null,
+    })
+  }
+
+  handleNoteDelete = (noteId) => {
+    const notes = this.state.notes.filter( note => note.id !== noteId );
+
+    this.setState({
+	notes:notes
+    })
+  }
+
+  componentDidMount(){
+    const folder_url = 'http://localhost:9090/folders';
+    const notes_url = 'http://localhost:9090/notes';
+
+    Promise.all([
+        fetch(folder_url, {method:'GET', headers: {'content-type': 'application/json'}}).then(response=>response.json()).then(data=>{return data;}),
+        fetch(notes_url, {method:'GET', headers: {'content-type': 'application/json'}}).then(response=>response.json()).then(data=>{return data;})
+    ]).then( arr =>{
+        this.setLists(arr[0],arr[1]);
+    }).catch((error)=>{
+        this.setState({
+          error: 'uho, something went wrong'
+        });
+    })
   }
 
   render(){
+
+    const contextValue = {
+      folders: this.state.folders,
+      notes: this.state.notes,
+      deleteNote: this.handleNoteDelete
+    }
     return (
       <div className='App'>
 	<Header/>
         <main>
+	  <NotefulContext.Provider value={contextValue}>
   	  <nav>
-	    <Route exact path='/' component={()=> {
-		return(<HomeSidebar folders={this.state.folders}/>);
-	    }}/>
-            <Route path='/folder/:folderId' component={(props)=> {
-                return(<FolderSidebar
-			selectedFolder={props.match.params.folderId} 
-			folders={this.state.folders}
-			/>
-		);
-            }}/>
-            <Route path='/note/:noteId' render={(props)=> {
-		const noteFolderId = this.state.notes.find( ({id}) => id === props.match.params.noteId );
-                return(
-			<NoteSidebar
-			folder={this.state.folders.find( ({id}) => id === noteFolderId.folderId) } 
-			onGoBack={()=>{props.history.goBack()}}
-		        />
-		      );
-            }}/>
+	    <Route exact path='/' component={HomeSidebar}/>
+
+	    <Route path='/folder/:folderId' component={FolderSidebar}/>
+
+	    <Route path='/note/:noteId' component={NoteSidebar}/>
 
 	  </nav>
    	  <section>
-	    <Route exact path='/' render={()=>{
-		return(<HomePage notes={this.state.notes}/>);
-	    }}/>
-            <Route path='/folder/:folderId' render={(props) => {
-                return(<FolderPage 
-			folderId={props.match.params.folderId}
-			notes={ this.state.notes.filter( ({folderId})=> folderId === props.match.params.folderId) }
-			/>
-		      );
-                }}
-            />
-            <Route path='/note/:noteId' render={(props) => {
-                return(<NotePage
-			note={this.state.notes.find( ({id})=> id === props.match.params.noteId)}
-			/>
-		      );
-                }}
-            />
-	    <Route path='/addNote/:folderId' render={(props)=> {
+	    <Route exact path='/' key='home' component={HomePage}/>
+
+	    <Route key='folder' path='/folder/:folderId' component={FolderPage}/>
+
+	    <Route key='note' path='/note/:noteId' component={NotePage}/>
+
+	    <Route key='add_note' path='/addNote/:folderId' render={(props)=> {
 		return(<AddNote
 			folder= {props.match.params.folderId}
 			/>
@@ -76,6 +91,7 @@ class App extends Component {
 	    />
             <Route path='/addFolder/' component={AddFolder}/>
 	  </section>
+	  </NotefulContext.Provider>
         </main>
       </div>
     );
