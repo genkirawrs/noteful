@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import NoteCard from '../NoteCard/NoteCard';
 import AddNoteButton from '../AddNoteButton/AddNoteButton';
+import NoteCardError from '../NoteCardError/NoteCardError';
 
 import NotefulContext from '../NotefulContext.js';
 
@@ -23,7 +24,9 @@ class NotePage extends Component {
 
     return(
         <div className='notepage'>
-        <NoteCard noteId={noteInfo.id} modified={noteInfo.modified} name={noteInfo.name} onDeleteNote={this.handleDeleteNote}/>
+	<NoteCardError key={noteInfo.id}>
+            <NoteCard noteId={noteInfo.id} modified={noteInfo.modified} name={noteInfo.name} onDeleteNote={this.handleDeleteNote}/>
+	</NoteCardError>
         <p>{noteInfo.content}</p>
         </div>
     );

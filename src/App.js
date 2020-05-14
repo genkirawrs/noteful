@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Route } from 'react-router-dom';
+import { Route, Switch } from 'react-router-dom';
 
 import Header from './Header';
 import HomePage from './HomePage/HomePage';
@@ -8,8 +8,11 @@ import NotePage from './NotePage/NotePage';
 import HomeSidebar from './HomeSidebar/HomeSidebar';
 import FolderSidebar from './FolderSidebar/FolderSidebar';
 import NoteSidebar from './NoteSidebar/NoteSidebar';
+import DefaultSidebar from './DefaultSidebar/DefaultSidebar';
 import AddNote from './AddNote/AddNote';
 import AddFolder from './AddFolder/AddFolder';
+import NotePageError from './NotePageError/NotePageError';
+import DefaultPage from './DefaultPage/DefaultPage';
 
 import NotefulContext from './NotefulContext.js';
 
@@ -20,7 +23,9 @@ class App extends Component {
     folders: [],
     notes: [],
     error: null,
-    handleDeleteNote: this.handleDeleteNote
+    handleDeleteNote: this.handleDeleteNote,
+    addFolder: this.addFolder,
+    addNote: this.addNote,
   }
 
   setLists = (folders, notes) => {
@@ -55,12 +60,25 @@ class App extends Component {
     })
   }
 
-  render(){
+  addFolder = folder => {
+    this.setState({
+      folders: [ ...this.state.folders, folder ],
+    })
+  }
 
+  addNote = note => {
+    this.setState({
+      notes: [ ...this.state.notes, note],
+    })
+  }
+
+  render(){
     const contextValue = {
       folders: this.state.folders,
       notes: this.state.notes,
-      deleteNote: this.handleNoteDelete
+      deleteNote: this.handleNoteDelete,
+      addFolder: this.addFolder,
+      addNote: this.addNote,
     }
     return (
       <div className='App'>
@@ -68,28 +86,27 @@ class App extends Component {
         <main>
 	  <NotefulContext.Provider value={contextValue}>
   	  <nav>
-	    <Route exact path='/' component={HomeSidebar}/>
-
-	    <Route path='/folder/:folderId' component={FolderSidebar}/>
-
-	    <Route path='/note/:noteId' component={NoteSidebar}/>
-
+	    <Switch>
+	        <Route path='/folder/:folderId' component={FolderSidebar}/>
+	        <Route path='/note/:noteId' component={NoteSidebar}/>
+	        <Route component={HomeSidebar} />
+	    </Switch>
 	  </nav>
    	  <section>
-	    <Route exact path='/' key='home' component={HomePage}/>
+	    <Switch>
+              <NotePageError>
+  	        <Route exact path='/' key='home' component={HomePage}/>
 
-	    <Route key='folder' path='/folder/:folderId' component={FolderPage}/>
+ 	        <Route key='folder' path='/folder/:folderId' component={FolderPage}/>
 
-	    <Route key='note' path='/note/:noteId' component={NotePage}/>
+	        <Route key='note' path='/note/:noteId' component={NotePage}/>
 
-	    <Route key='add_note' path='/addNote/:folderId' render={(props)=> {
-		return(<AddNote
-			folder= {props.match.params.folderId}
-			/>
-		      );
-		}}
-	    />
-            <Route path='/addFolder/' component={AddFolder}/>
+	        <Route key='add_note' path='/addNote/:folderId' component={AddNote}/>
+
+                <Route key='add_folder' path='/addFolder/' component={AddFolder}/>
+
+              </NotePageError>
+	    </Switch>
 	  </section>
 	  </NotefulContext.Provider>
         </main>
