@@ -26,8 +26,6 @@ class AddFolder extends Component {
     const folderName = this.state.folder_name.value.trim();
     if (folderName.length === 0) {
       return 'Folder name is required';
-    } else if (folderName.length < 3) {
-      return 'Folder name must be at least 3 characters long';
     }
   }
 
@@ -58,7 +56,7 @@ class AddFolder extends Component {
         return res.json()
       })
       .then(data => {
-        this.props.history.push('/')
+        this.props.history.push(`/folder/${data.id}`)
         this.context.addFolder(data)
       })
       .catch(error => {

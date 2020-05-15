@@ -8,11 +8,9 @@ import NotePage from './NotePage/NotePage';
 import HomeSidebar from './HomeSidebar/HomeSidebar';
 import FolderSidebar from './FolderSidebar/FolderSidebar';
 import NoteSidebar from './NoteSidebar/NoteSidebar';
-import DefaultSidebar from './DefaultSidebar/DefaultSidebar';
 import AddNote from './AddNote/AddNote';
 import AddFolder from './AddFolder/AddFolder';
 import NotePageError from './NotePageError/NotePageError';
-import DefaultPage from './DefaultPage/DefaultPage';
 
 import NotefulContext from './NotefulContext.js';
 
@@ -22,7 +20,7 @@ class App extends Component {
   state = {
     folders: [],
     notes: [],
-    error: null,
+    error: '',
     handleDeleteNote: this.handleDeleteNote,
     addFolder: this.addFolder,
     addNote: this.addNote,
@@ -48,16 +46,23 @@ class App extends Component {
     const folder_url = 'http://localhost:9090/folders';
     const notes_url = 'http://localhost:9090/notes';
 
-    Promise.all([
-        fetch(folder_url, {method:'GET', headers: {'content-type': 'application/json'}}).then(response=>response.json()).then(data=>{return data;}),
-        fetch(notes_url, {method:'GET', headers: {'content-type': 'application/json'}}).then(response=>response.json()).then(data=>{return data;})
-    ]).then( arr =>{
-        this.setLists(arr[0],arr[1]);
-    }).catch((error)=>{
-        this.setState({
-          error: 'uho, something went wrong'
-        });
-    })
+    Promise.all([fetch(folder_url), fetch(notes_url)])
+	.then(([notesRes, foldersRes]) => {
+                if (!notesRes.ok)
+                    return notesRes.json().then(e => Promise.reject(e));
+                if (!foldersRes.ok)
+                    return foldersRes.json().then(e => Promise.reject(e));
+
+                return Promise.all([notesRes.json(), foldersRes.json()]);
+         })
+         .then(([folders,notes]) => {
+                this.setState({folders:folders, notes:notes});
+         })
+         .catch(error => {
+		this.setState({error: 'Sorry, there was an error loading Noteful, please refresh or try again later.'});
+         });
+
+
   }
 
   addFolder = folder => {
@@ -73,28 +78,39 @@ class App extends Component {
   }
 
   render(){
-    const contextValue = {
-      folders: this.state.folders,
-      notes: this.state.notes,
-      deleteNote: this.handleNoteDelete,
-      addFolder: this.addFolder,
-      addNote: this.addNote,
-    }
-    return (
-      <div className='App'>
+    if(this.state.error.length > 0){
+	return(
+	<div className='App'>
 	<Header/>
-        <main>
-	  <NotefulContext.Provider value={contextValue}>
-  	  <nav>
-	    <Switch>
+	<main>
+	<h2>{this.state.error}</h2>
+	</main>
+	</div>
+	);
+    }else{
+
+      const contextValue = {
+        folders: this.state.folders,
+        notes: this.state.notes,
+        deleteNote: this.handleNoteDelete,
+        addFolder: this.addFolder,
+        addNote: this.addNote,
+      }
+      return (
+        <div className='App'>
+  	  <Header/>
+          <main>
+	    <NotefulContext.Provider value={contextValue}>
+   	    <nav>
+	      <Switch>
 	        <Route path='/folder/:folderId' component={FolderSidebar}/>
 	        <Route path='/note/:noteId' component={NoteSidebar}/>
 	        <Route component={HomeSidebar} />
-	    </Switch>
-	  </nav>
-   	  <section>
-	    <Switch>
-              <NotePageError>
+	      </Switch>
+	    </nav>
+   	    <section>
+	      <Switch>
+                <NotePageError>
   	        <Route exact path='/' key='home' component={HomePage}/>
 
  	        <Route key='folder' path='/folder/:folderId' component={FolderPage}/>
@@ -105,13 +121,14 @@ class App extends Component {
 
                 <Route key='add_folder' path='/addFolder/' component={AddFolder}/>
 
-              </NotePageError>
-	    </Switch>
-	  </section>
-	  </NotefulContext.Provider>
-        </main>
-      </div>
-    );
+                </NotePageError>
+	      </Switch>
+	    </section>
+	    </NotefulContext.Provider>
+          </main>
+        </div>
+      );
+    }
   }
 }
 

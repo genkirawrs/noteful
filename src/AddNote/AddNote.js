@@ -38,17 +38,20 @@ class AddNote extends Component {
     this.setState({content: {value: noteContent, touched: true}});
   }
 
-  componentDidMount(){
-	const defaultFolder = this.props.match.params.folderId === 0 ? this.context[0].folderId : this.props.match.params.folderId;
-	this.updateNoteFolder(defaultFolder);
-  }
-
   validateNoteName(){
     const noteName = this.state.name.value.trim();
     if (noteName.length === 0) {
       return 'Note name is required';
     }
   }
+
+  validateNoteFolder(){
+    const noteFolder = this.state.folderId.value.trim();
+    if (noteFolder === 'default' || noteFolder.length === 0) {
+      return 'Please select a folder to place note in.';
+    }
+  }
+
 
   handleSubmit(event){
     event.preventDefault();
@@ -82,11 +85,7 @@ class AddNote extends Component {
         return res.json()
       })
       .then(data => {
-	if( this.props.match.params.folderId === 0){
-          this.props.history.push('/')
-	}else{
-	  this.props.history.push(`/folder/${folderId.value}`)
-	}
+	this.props.history.push(`/folder/${folderId.value}`)
         this.context.addNote(data)
       })
       .catch(error => {
@@ -94,10 +93,27 @@ class AddNote extends Component {
       })
   }
 
+  componentDidMount(){
+    if( this.context.folders.filter((folder)=> {return folder.id === this.props.match.params.folderId}) ){
+	this.updateNoteFolder(this.props.match.params.folderId);
+    }
+  }
+
   render(){
     const noteNameError = this.validateNoteName();
+    const noteFolderError = this.validateNoteFolder();
+
+
     const { error } = this.state;
-    const folderSelect = this.state.folderId.value;
+    let folderSelect = 'default';//default folder drop down select
+
+    if( this.state.folderId.touched === false && this.context.folders.filter((folder)=> {return folder.id === this.props.match.params.folderId}) ){
+	//if state has not been updated yet and the prop being passed in is in the folder list, set the default drop down to that
+	folderSelect = this.props.match.params.folderId;
+    }else if (this.state.folderId.touched){
+	//or, if state has been updated, set default drop down selected as what is saved in state
+	folderSelect = this.state.folderId.value;
+    }
 
     return(
         <div className='add-note'>
@@ -121,6 +137,7 @@ class AddNote extends Component {
                     onChange={e=> this.updateNoteFolder(e.target.value)}
 		    value= {folderSelect}
                 >
+		<option key='default' value='default'>Select a folder</option>
 		{this.context.folders.length > 0 ?
 		  (
 		    this.context.folders.map((folder,index) => {
@@ -129,10 +146,8 @@ class AddNote extends Component {
 		    })
 		  )
 		:null }
-
-
 		</select>
-
+		{this.state.folderId.touched && (<ValidationError message={noteFolderError}/>)}
 		<br/><br/>
 
                 <label htmlFor='note_content'>Add Content to Note: {'   '}</label>
@@ -145,7 +160,8 @@ class AddNote extends Component {
 
                 <button type='submit' className='add-note-button'
                     disabled = {
-                        this.validateNoteName()
+                        this.validateNoteName() ||
+			this.validateNoteFolder()
                     }
                 >
                    Add Note
@@ -158,3 +174,4 @@ class AddNote extends Component {
 }
 
 export default AddNote;
+

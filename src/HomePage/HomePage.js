@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+
 import NoteCard from '../NoteCard/NoteCard';
 import AddNoteButton from '../AddNoteButton/AddNoteButton';
 import NoteCardError from '../NoteCardError/NoteCardError';
@@ -13,6 +14,7 @@ class HomePage extends Component {
 
   render(){
     const { notes } = this.context;
+
     return(
 	<ul>
         {notes.map(note=>{
@@ -26,7 +28,7 @@ class HomePage extends Component {
 		</li>
 	    );
         })}
-	<li className='home-add-note-button'><AddNoteButton folderId='0'/></li>
+	<li className='home-add-note-button'><AddNoteButton/></li>
 	</ul>
     );
   }

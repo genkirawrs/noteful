@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import NoteCard from '../NoteCard/NoteCard';
-import AddNoteButton from '../AddNoteButton/AddNoteButton';
 import NoteCardError from '../NoteCardError/NoteCardError';
 
 import NotefulContext from '../NotefulContext.js';
@@ -14,6 +12,7 @@ class NotePage extends Component {
   }
 
   render(){
+
     const { notes } = this.context;
     let noteInfo = {};
     notes.forEach( (item) => {

@@ -8,7 +8,6 @@ class NoteSidebar extends Component {
 
   render(){
     const { folders, notes } = this.context;
-    const noteId = this.props.match.params.noteId;
     let noteInfo = {}
 
     notes.forEach( (item) => {
@@ -27,7 +26,7 @@ class NoteSidebar extends Component {
 
     return(
         <div className='note-sidebar-folder'>
-	<a className='note-sidebar-back-btn' onClick={()=>this.props.history.goBack()}>Go back</a>
+	<button className='note-sidebar-back-btn' onClick={()=>this.props.history.goBack()}>Go back</button>
 	<h3>{folder.name}</h3>
 	</div>
     );
