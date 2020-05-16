@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`add note button renders without crashing 1`] = `
+<a
+  className="add-note-btn"
+  href="/addNote/none"
+  onClick={[Function]}
+>
+  Add Note
+</a>
+`;
