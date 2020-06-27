@@ -14,15 +14,14 @@ class HomePage extends Component {
 
   render(){
     const { notes } = this.context;
-
     return(
 	<ul>
         {notes.map(note=>{
             return(
 		<li key={note.id}>
 		<NoteCardError key={note.id}>
-		  <Link to={`/note/${note.id}`}>
-		    <NoteCard noteId={note.id} modified={note.modified} name={note.name} />
+		  <Link to={`/notes/${note.id}`}>
+		    <NoteCard noteId={note.id} modified={note.date_modified} name={note.title} />
 		  </Link>
 		</NoteCardError>
 		</li>

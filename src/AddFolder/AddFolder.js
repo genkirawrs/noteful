@@ -38,7 +38,7 @@ class AddFolder extends Component {
     }
 
     this.setState({ error: null })
-    fetch('http://localhost:9090/folders', {
+    fetch('http://localhost:8000/folders', {
       method: 'POST',
       body: JSON.stringify(addFolderInfo),
       headers: {

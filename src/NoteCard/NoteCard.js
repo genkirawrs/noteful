@@ -14,7 +14,7 @@ class NoteCard extends Component {
 
 
   deleteNoteRequest = (noteId)=>{
-    const delete_url = `http://localhost:9090/notes/${noteId}`;
+    const delete_url = `http://localhost:8000/notes/${noteId}`;
     fetch(delete_url, {
       method: 'DELETE',
       headers: {
@@ -40,13 +40,11 @@ class NoteCard extends Component {
 
   render(){
     let modifiedDate = '';
-
     const date = Date.parse(this.props.modified);
     if(!isNaN(date)){
 	modifiedDate = `Date modified on ${this.formatDate(this.props.modified)}`;
     }
-
-    if( this.props.noteId.length > 0 && this.props.name.length > 0 ){
+    if( this.props.noteId > 0 && this.props.name.length > 0 ){
       return(
         <NotefulContext.Consumer>
   	  {(context) => (
@@ -83,7 +81,7 @@ NoteCard.defaultProps = {
 }
 
 NoteCard.propTypes = {
-    noteId: PropTypes.string.isRequired,
+    noteId: PropTypes.number.isRequired,
     modified: (props, propName, componentName) => {
 	const prop = props[propName];
 	const date = Date.parse(prop);

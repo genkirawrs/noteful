@@ -11,7 +11,6 @@ import NoteSidebar from './NoteSidebar/NoteSidebar';
 import AddNote from './AddNote/AddNote';
 import AddFolder from './AddFolder/AddFolder';
 import NotePageError from './NotePageError/NotePageError';
-
 import NotefulContext from './NotefulContext.js';
 
 import './App.css';
@@ -43,8 +42,8 @@ class App extends Component {
   }
 
   componentDidMount(){
-    const folder_url = 'http://localhost:9090/folders';
-    const notes_url = 'http://localhost:9090/notes';
+    const folder_url = 'http://localhost:8000/folders';
+    const notes_url = 'http://localhost:8000/notes';
 
     Promise.all([fetch(folder_url), fetch(notes_url)])
 	.then(([notesRes, foldersRes]) => {
@@ -103,8 +102,8 @@ class App extends Component {
 	    <NotefulContext.Provider value={contextValue}>
    	    <nav>
 	      <Switch>
-	        <Route path='/folder/:folderId' component={FolderSidebar}/>
-	        <Route path='/note/:noteId' component={NoteSidebar}/>
+	        <Route path='/folders/:folderId' component={FolderSidebar}/>
+	        <Route path='/notes/:noteId' component={NoteSidebar}/>
 	        <Route component={HomeSidebar} />
 	      </Switch>
 	    </nav>
@@ -113,9 +112,9 @@ class App extends Component {
                 <NotePageError>
   	        <Route exact path='/' key='home' component={HomePage}/>
 
- 	        <Route key='folder' path='/folder/:folderId' component={FolderPage}/>
+ 	        <Route key='folder' path='/folders/:folderId' component={FolderPage}/>
 
-	        <Route key='note' path='/note/:noteId' component={NotePage}/>
+	        <Route key='note' path='/notes/:noteId' component={NotePage}/>
 
 	        <Route key='add_note' path='/addNote/:folderId' component={AddNote}/>
 

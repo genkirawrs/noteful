@@ -59,15 +59,15 @@ class AddNote extends Component {
     
 
     const addNoteInfo = {
-        name: name.value,
-	folderId: folderId.value,
+        title: name.value,
+	folder_id: folderId.value,
 	content: content.value,
 	modified: new Date().toISOString(),
     }
 
     this.setState({ error: null })
 
-    fetch('http://localhost:9090/notes', {
+    fetch('http://localhost:8000/notes', {
       method: 'POST',
       body: JSON.stringify(addNoteInfo),
       headers: {

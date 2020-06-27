@@ -12,7 +12,7 @@ class HomeSidebar extends Component {
     return(
         <ul>
 	  {folders.map(folder=>
-            <li key={folder.id}><Link to={`/folder/${folder.id}`}>{folder.name}</Link></li>
+            <li key={folder.id}><Link to={`/folders/${folder.id}`}>{folder.name}</Link></li>
         )}
 	<li><AddFolderButton/></li>
 	</ul>
